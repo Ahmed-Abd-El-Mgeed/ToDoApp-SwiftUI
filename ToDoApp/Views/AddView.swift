@@ -9,7 +9,13 @@ import SwiftUI
 
 struct AddView: View {
     
+    @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var listViewModel : ListViewModel
+    
     @State var textFieldText: String = ""
+    @State var alertTitle: String = ""
+    @State var showAlert : Bool = false
+    
     
     var body: some View {
         ScrollView{
@@ -20,9 +26,8 @@ struct AddView: View {
                     .background(Color.gray.opacity(0.3))
                     .cornerRadius(10)
                 
-                Button(action: {
-                    // ACtion here
-                }, label: { Text("Save".uppercased())
+                Button(action: savedItemAction
+                       , label: { Text("Save".uppercased())
                         .frame(height: 55)
                         .frame(maxWidth: .infinity)
                         .font(.headline)
@@ -35,6 +40,30 @@ struct AddView: View {
             .padding()
         }
         .navigationTitle("Add An Item 🖋️")
+        .alert(isPresented: $showAlert) {
+            getAlert()
+        }
+    }
+    
+    func savedItemAction(){
+        
+       if checkTextField(){
+           listViewModel.addItem(title: textFieldText)
+           presentationMode.wrappedValue.dismiss()
+        }
+    }
+    
+    func checkTextField() -> Bool{
+        if textFieldText.count < 3 {
+            alertTitle = "your New items need to add more than 3 chracters 😱"
+            showAlert.toggle()
+            return false
+        }
+        return true
+    }
+    
+    func getAlert() -> Alert {
+        return Alert(title: Text(alertTitle))
     }
 }
 
